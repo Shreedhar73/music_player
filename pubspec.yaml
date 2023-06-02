@@ -49,6 +49,7 @@ dependencies:
   build_runner: ^2.4.4
   # path: ^1.8.3
   on_audio_query: ^2.9.0
+  permission_handler: ^10.2.0
 
 dev_dependencies:
   flutter_test:
