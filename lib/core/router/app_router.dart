@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:music_player/features/splash/splash_screen.dart';
 import '../../features/bottom_nav/presentation/screens/bottom_bar.dart';
 import '../../features/discover/presentation/screens/discover.dart';
 import '../../features/favorites/presentation/screens/favorites.dart';
@@ -13,9 +14,14 @@ class AppRouter extends _$AppRouter {
   @override      
   List<AutoRoute> get routes => [     
     AutoRoute(
+      page: SplashRoute.page,
+      initial: true,
+      maintainState: false,
+      path: '/splash'
+    ),
+    AutoRoute(
       page: BottombarRoute.page,
       path: '/bottombar',
-      initial: true,
       children: [
         AutoRoute(
           page: DiscoverRoute.page,

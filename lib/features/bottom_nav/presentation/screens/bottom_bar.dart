@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:music_player/core/router/app_router.dart';
-import 'package:on_audio_query/on_audio_query.dart';
 
 @RoutePage()  
 class BottombarPage extends StatefulWidget {
@@ -29,15 +28,10 @@ class _BottombarPageState extends State<BottombarPage> with TickerProviderStateM
 
   List<AnimationController> animationControllerList = [];
   List<Animation> animationsList = [];
-  checkForPermission() async{
-    await OnAudioQuery().checkAndRequest(
-      retryRequest: false
-    );
-  }
+  
 
   @override
   void initState() {
-    checkForPermission();
     super.initState();
     _controller =
         AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
