@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:music_player/core/router/app_router.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 
 @RoutePage()  
 class BottombarPage extends StatefulWidget {
@@ -28,10 +29,16 @@ class _BottombarPageState extends State<BottombarPage> with TickerProviderStateM
 
   List<AnimationController> animationControllerList = [];
   List<Animation> animationsList = [];
+  checkForPermission() async{
+    await OnAudioQuery().checkAndRequest(
+      retryRequest: false
+    );
+  }
 
   @override
   void initState() {
-     super.initState();
+    checkForPermission();
+    super.initState();
     _controller =
         AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
     _animation = Tween<double>(begin: 25, end: 33).animate(CurvedAnimation(
@@ -140,63 +147,65 @@ class _BottombarPageState extends State<BottombarPage> with TickerProviderStateM
           routes: routes,
           builder: (context, child) {
             final tabsTouter = AutoTabsRouter.of(context);
-            return Scaffold(
-              backgroundColor: const Color(0xFF0A092b),
-              body: Stack(
-                children: [
-                  child,
-                   Positioned(
-                    bottom: 0,
-                    right: 0,
-                    left: 0,
-                    child: Container(
-                      height: size.width * .14,
-                      width: size.width,
-                      padding: const EdgeInsets.only(top: 15),
-                      margin: EdgeInsets.only(left: size.width * .04, right: size.width * .04,),
-                      decoration:  BoxDecoration(
-                        color: const Color(0xFF0A091E),
-                        borderRadius: const BorderRadius.only(
-                          topLeft : Radius.circular(30),
-                          topRight : Radius.circular(30),
-                        ),
-                        boxShadow:  [
-                          BoxShadow(
-                            color: Colors.white.withOpacity(0.5),
-                            offset: const Offset(0, 0),
-                            blurRadius: 30,
-                            spreadRadius: 0.5,
+            return SafeArea(
+              child: Scaffold(
+                backgroundColor: const Color(0xFF0A092b),
+                body: Stack(
+                  children: [
+                    child,
+                     Positioned(
+                      bottom: 0,
+                      right: 0,
+                      left: 0,
+                      child: Container(
+                        height: size.width * .14,
+                        width: size.width,
+                        padding: const EdgeInsets.only(top: 15),
+                        margin: EdgeInsets.only(left: size.width * .04, right: size.width * .04,),
+                        decoration:  BoxDecoration(
+                          color: const Color(0xFF0A091E),
+                          borderRadius: const BorderRadius.only(
+                            topLeft : Radius.circular(30),
+                            topRight : Radius.circular(30),
                           ),
-                        ]
-                      ),
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 3,
-                        padding: EdgeInsets.zero,
-                        itemExtent: size.width/3-10,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (ctx,index){
-                          return IconButton(
-                            icon: Icon(
-                              bottomNavBarItesm[index]['icon'] as IconData,
-                              color: tabsTouter.activeIndex == index ? Colors.blue : Colors.white,
-                              size: animationsList[index].value,
+                          boxShadow:  [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.5),
+                              offset: const Offset(0, 0),
+                              blurRadius: 30,
+                              spreadRadius: 0.5,
                             ),
-                            onPressed: () {
-                              tabsTouter.setActiveIndex(index);
-                              setState(() {
-                                Function.apply(animateFunctions[index],null);
-                                HapticFeedback.lightImpact();
-                              });
-                            },
-                            splashColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                          );
-                        },
+                          ]
+                        ),
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 3,
+                          padding: EdgeInsets.zero,
+                          itemExtent: size.width/3-10,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (ctx,index){
+                            return IconButton(
+                              icon: Icon(
+                                bottomNavBarItesm[index]['icon'] as IconData,
+                                color: tabsTouter.activeIndex == index ? Colors.blue : Colors.white,
+                                size: animationsList[index].value,
+                              ),
+                              onPressed: () {
+                                tabsTouter.setActiveIndex(index);
+                                setState(() {
+                                  Function.apply(animateFunctions[index],null);
+                                  HapticFeedback.lightImpact();
+                                });
+                              },
+                              splashColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                   )
-                ],
+                     )
+                  ],
+                ),
               ),
             );
           }),
