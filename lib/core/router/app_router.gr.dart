@@ -40,7 +40,8 @@ abstract class _$AppRouter extends RootStackRouter {
         routeData: routeData,
         child: MusicPlayerScreen(
           key: args.key,
-          song: args.song,
+          songList: args.songList,
+          index: args.index,
         ),
       );
     },
@@ -106,13 +107,15 @@ class FavoritesRoute extends PageRouteInfo<void> {
 class MusicPlayerRoute extends PageRouteInfo<MusicPlayerRouteArgs> {
   MusicPlayerRoute({
     Key? key,
-    SongModel? song,
+    List<SongModel?>? songList,
+    int index = 0,
     List<PageRouteInfo>? children,
   }) : super(
           MusicPlayerRoute.name,
           args: MusicPlayerRouteArgs(
             key: key,
-            song: song,
+            songList: songList,
+            index: index,
           ),
           initialChildren: children,
         );
@@ -126,16 +129,19 @@ class MusicPlayerRoute extends PageRouteInfo<MusicPlayerRouteArgs> {
 class MusicPlayerRouteArgs {
   const MusicPlayerRouteArgs({
     this.key,
-    this.song,
+    this.songList,
+    this.index = 0,
   });
 
   final Key? key;
 
-  final SongModel? song;
+  final List<SongModel?>? songList;
+
+  final int index;
 
   @override
   String toString() {
-    return 'MusicPlayerRouteArgs{key: $key, song: $song}';
+    return 'MusicPlayerRouteArgs{key: $key, songList: $songList, index: $index}';
   }
 }
 

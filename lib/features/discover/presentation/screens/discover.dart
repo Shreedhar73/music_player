@@ -33,8 +33,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (BuildContext context ,index){
-                            SongModel? song = state.songsList[index];
-                            return songTile(song!);
+                            return songTile(state.songsList,index);
                           },
                           childCount: state.songsList.length
                         ),
@@ -53,20 +52,21 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
-  songTile(SongModel song){
+  songTile(List<SongModel?> songList,int index){
     return ListTile(
       minVerticalPadding: 0,
       contentPadding: EdgeInsets.zero,
-      title: Text(song.displayName,style: const TextStyle(color: Colors.white),),
+      title: Text(songList[index]!.displayName,style: const TextStyle(color: Colors.white),),
       onTap: () {
         context.router.push(
           MusicPlayerRoute(
-            song: song
+            songList : songList,
+            index: index
           ),
         );
       },
       leading: QueryArtworkWidget(
-        id: song.id,
+        id: songList[index]!.id,
         type: ArtworkType.AUDIO,
       )
     );
