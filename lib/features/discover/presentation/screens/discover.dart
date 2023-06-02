@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:music_player/core/router/app_router.dart';
 import 'package:music_player/features/discover/presentation/bloc/discover_bloc.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 @RoutePage()  
@@ -57,6 +58,13 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       minVerticalPadding: 0,
       contentPadding: EdgeInsets.zero,
       title: Text(song.displayName,style: const TextStyle(color: Colors.white),),
+      onTap: () {
+        context.router.push(
+          MusicPlayerRoute(
+            song: song
+          ),
+        );
+      },
       leading: QueryArtworkWidget(
         id: song.id,
         type: ArtworkType.AUDIO,

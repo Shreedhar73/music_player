@@ -34,9 +34,14 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     MusicPlayerRoute.name: (routeData) {
+      final args = routeData.argsAs<MusicPlayerRouteArgs>(
+          orElse: () => const MusicPlayerRouteArgs());
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const MusicPlayerScreen(),
+        child: MusicPlayerScreen(
+          key: args.key,
+          song: args.song,
+        ),
       );
     },
     PlaylistsRoute.name: (routeData) {
@@ -98,16 +103,40 @@ class FavoritesRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [MusicPlayerScreen]
-class MusicPlayerRoute extends PageRouteInfo<void> {
-  const MusicPlayerRoute({List<PageRouteInfo>? children})
-      : super(
+class MusicPlayerRoute extends PageRouteInfo<MusicPlayerRouteArgs> {
+  MusicPlayerRoute({
+    Key? key,
+    SongModel? song,
+    List<PageRouteInfo>? children,
+  }) : super(
           MusicPlayerRoute.name,
+          args: MusicPlayerRouteArgs(
+            key: key,
+            song: song,
+          ),
           initialChildren: children,
         );
 
   static const String name = 'MusicPlayerRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<MusicPlayerRouteArgs> page =
+      PageInfo<MusicPlayerRouteArgs>(name);
+}
+
+class MusicPlayerRouteArgs {
+  const MusicPlayerRouteArgs({
+    this.key,
+    this.song,
+  });
+
+  final Key? key;
+
+  final SongModel? song;
+
+  @override
+  String toString() {
+    return 'MusicPlayerRouteArgs{key: $key, song: $song}';
+  }
 }
 
 /// generated route for
