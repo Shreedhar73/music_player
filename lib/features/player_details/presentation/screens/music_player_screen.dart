@@ -1,8 +1,12 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:music_player/features/player_details/presentation/bloc/audio_player_controller.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+
+import '../bloc/audio_player_bloc.dart';
 
 @RoutePage()  
 class MusicPlayerScreen extends StatefulWidget {
@@ -17,6 +21,7 @@ class MusicPlayerScreen extends StatefulWidget {
 class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   late SongModel? currentSong;
   late int currentindex;
+  final PageManagerController pageManagerController = PageManagerController.instance;
   @override
   void initState() {
     currentindex = widget.index;
@@ -50,8 +55,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                     currentindex = value;
                     currentSong = widget.songList![value];
                   });
-                  disposePlayer();
-                  initializePlayerController(currentSong!.data);
                 },
                 itemBuilder: (context,idx) {
                   return QueryArtworkWidget(
@@ -95,7 +98,9 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
               ),
             ),
 
-            AudioPlayerWidget(url: currentSong!.data)
+            AudioPlayerWidget(
+              song: currentSong,
+            )
           ],
         ),
       ),
@@ -103,25 +108,10 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   }
 }
 
-late AudioPlayer _player;
-initializePlayerController(String filePath){
-  _player = AudioPlayer(
-  );
-  _player.setAudioSource(
-    AudioSource.file(filePath)
-  );
-  _player.play();
-}
-
-disposePlayer(){
-  _player.pause();
-  _player.dispose();
-}
-
 
 class AudioPlayerWidget extends StatefulWidget {
-  final String url;
-  const AudioPlayerWidget({super.key, required this.url});
+  final SongModel? song;
+  const AudioPlayerWidget({super.key,this.song});
 
   @override
   State<AudioPlayerWidget> createState() => _AudioPlayerWidgetState();
@@ -132,60 +122,288 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   @override
   void initState() {
     super.initState();
-    initializePlayerController(widget.url);
   }
 
   @override
   void dispose() {
-    disposePlayer();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<PlayerState>(
-      stream: _player.playerStateStream,
-      builder: (context, snapshot) {
-        final playerState = snapshot.data;
-        final processingState = playerState?.processingState;
-
-        return Column(
-          children: [
-            if (processingState == ProcessingState.loading ||
-                processingState == ProcessingState.buffering)
-              const CircularProgressIndicator(),
-            if (processingState != ProcessingState.loading)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return BlocListener<AudioPlayerBloc, AudioPlayerState>(
+      listener: (context, state) {
+        if(state is AudioPlayerInitialized){
+          context.read<AudioPlayerBloc>().add(AudioPlayEvent());
+        }
+      },
+      child: BlocBuilder<AudioPlayerBloc, AudioPlayerState>(
+          bloc: context.read<AudioPlayerBloc>()..add(AudioPlayerInitializeEvent(songModel: widget.song)),
+          builder: (context, state) {
+            return SizedBox(
+              width: MediaQuery.of(context).size.width*1,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  if (processingState != ProcessingState.completed)
-                    IconButton(
-                      icon:  _player.playing ? const Icon(Icons.pause): const Icon(Icons.play_arrow),
-                      onPressed: () async {
-                      ! _player.playing ?   _player.play() : _player.pause();
-                      },
+                  Padding(
+                    padding: const EdgeInsets.only(top: 22),
+                    child: Container(
+                      height: 50,
+                      padding: const EdgeInsets.only(
+                        left: 5,
+                        top: 5,
+                        right: 10,
+                        bottom: 30
+                      ),
+                      child: ProgressBar(
+                        progressBarColor: Colors.blue,
+                        baseBarColor: Colors.white,
+                        thumbColor: Colors.transparent,
+                        thumbRadius: 10,
+                        thumbGlowColor: Colors.white.withOpacity(0.5),
+                        thumbGlowRadius: 10,
+                        timeLabelLocation:
+                            TimeLabelLocation.sides,
+                        timeLabelPadding: 0,
+                        timeLabelType: TimeLabelType
+                            .remainingTime,
+                        timeLabelTextStyle:
+                            const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10),
+                        progress: Duration.zero,
+                        buffered: Duration.zero,
+                        total: Duration.zero,
+                        onSeek: (Duration x){},
+                      ),
                     ),
-                  if (processingState == ProcessingState.completed)
-                    IconButton(
-                      icon: const Icon(Icons.replay),
-                      onPressed: () {
-                        _player.seek(Duration.zero);
-                        _player.play();
-                      },
-                    ),
+                  ),
+                  SizedBox(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                          },
+                          icon: const Icon(
+                            Icons.shuffle,
+                            color: Colors.white,
+                          )
+                        ),
+                        IconButton(
+                          onPressed: () {
+                          },
+                          icon: const Icon(
+                            Icons.skip_previous_outlined,
+                            color: Colors.white,
+                          )
+                        ),
+                        BlocBuilder<AudioPlayerBloc, AudioPlayerState>(
+                          builder: (context, state){
+                            if(state is IsPausedState){
+                              return InkWell(
+                                onTap: (){
+                                    context.read<AudioPlayerBloc>().add(AudioPlayEvent());
+                                },
+                                child: CircleAvatar(
+                                  radius: 35,
+                                  backgroundColor: Colors.blue.withOpacity(0.5),
+                                  child: const Icon(
+                                      Icons.play_arrow_outlined,
+                                      size: 45,
+                                      color: Colors.white,
+                                    )
+                                ),
+                              );
+                            }else{
+                              return InkWell(
+                                onTap: (){
+                                  context.read<AudioPlayerBloc>().add(AudioPauseEvent());
+                                },
+                                child: CircleAvatar(
+                                  radius: 35,
+                                  backgroundColor: Colors.blue.withOpacity(0.5),
+                                  child: const Icon(
+                                      Icons.pause,
+                                      size: 45,
+                                      color: Colors.white,
+                                    )
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        IconButton(
+                          onPressed: () {
+                          },
+                          icon: const Icon(
+                            Icons.skip_next_outlined,
+                            color: Colors.white,
+                          )
+                        ),
+                        IconButton(
+                          onPressed: () {
+                          },
+                          icon: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                          )
+                        )
+                      ],
+                    )
+                  )
                 ],
               ),
-              Slider(
-                value: _player.position.inMilliseconds.toDouble(),
-                min: 0,
-                max: _player.duration == null ? 0.0 :  _player.duration!.inMilliseconds.toDouble(),
-                onChanged: (value) {
-                  _player.seek(Duration(milliseconds: value.toInt()));
-                },
-              ),
-          ],
-        );
-      },
+            );
+            
+            // return SizedBox(
+            //   width: MediaQuery.of(context).size.width* 1,
+            //   child: Column(
+            //     mainAxisAlignment: MainAxisAlignment.start,
+            //     children: [
+            //       Container(
+            //         color: Colors.transparent,
+            //         child: Column(
+            //           crossAxisAlignment: CrossAxisAlignment.start,
+            //           mainAxisSize: MainAxisSize.min,
+            //           children: [
+            //             Padding(
+            //               padding: const EdgeInsets.only(top: 22),
+            //               child: Container(
+            //                 height: 50,
+            //                 padding: const EdgeInsets.only(
+            //                     left: 5,
+            //                     top: 5,
+            //                     right: 10,
+            //                     bottom: 30),
+            //                 child: ValueListenableBuilder<ProgressBarState>(
+            //                   valueListenable: widget.pageManagerController!.progressNotifier!,
+            //                   builder: (_, value, __) {
+            //                     return ProgressBar(
+            //                       progressBarColor: Colors.blue,
+            //                       baseBarColor: Colors.white,
+            //                       thumbColor: Colors.transparent,
+            //                       thumbRadius: 10,
+            //                       thumbGlowColor: Colors.white.withOpacity(0.5),
+            //                       thumbGlowRadius: 10,
+            //                       timeLabelLocation:
+            //                           TimeLabelLocation.sides,
+            //                       timeLabelPadding: 0,
+            //                       timeLabelType: TimeLabelType
+            //                           .remainingTime,
+            //                       timeLabelTextStyle:
+            //                           const TextStyle(
+            //                               color: Colors.white,
+            //                               fontSize: 10),
+            //                       progress: value.current,
+            //                       buffered: value.buffered,
+            //                       total: value.total,
+            //                       onSeek: widget.pageManagerController!.seek,
+            //                     );
+            //                   },
+            //                 ),
+            //               ),
+            //             ),
+                        // SizedBox(
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //     children: [
+                        //       IconButton(
+                        //         onPressed: () {
+                        //         },
+                        //         icon: const Icon(
+                        //           Icons.shuffle,
+                        //           color: Colors.white,
+                        //         )
+                        //       ),
+                        //       IconButton(
+                        //         onPressed: () {
+                        //         },
+                        //         icon: const Icon(
+                        //           Icons.skip_previous_outlined,
+                        //           color: Colors.white,
+                        //         )
+                        //       ),
+                        //       Padding(
+                        //         padding: const EdgeInsets.only(bottom: 8),
+                        //         child: ValueListenableBuilder<ButtonState>(
+                        //           valueListenable: widget.pageManagerController!.buttonNotifier!,
+                        //           builder: (_, value, __) {
+                        //             switch (value) {
+                        //               case ButtonState.loading:
+                        //                 return const Padding(
+                        //                   padding:  EdgeInsets.only(left: 10, right: 10),
+                        //                   child:  SizedBox(
+                        //                     height: 12,
+                        //                     width: 12,
+                        //                     child:  CircularProgressIndicator.adaptive(
+                        //                       //backgroundColor: white,
+                        //                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        //                     ),
+                        //                   ),
+                        //                 );
+                        //               case ButtonState.paused:
+                        //                 return InkWell(
+                        //                   onTap: (){
+                        //                     play();
+                        //                   },
+                        //                   child: CircleAvatar(
+                        //                     radius: 35,
+                        //                     backgroundColor: Colors.blue.withOpacity(0.5),
+                        //                     child: const Icon(
+                        //                         Icons.play_arrow_outlined,
+                        //                         size: 45,
+                        //                         color: Colors.white,
+                        //                       )
+                        //                   ),
+                        //                 );
+                        //               case ButtonState.playing:
+                        //                 return InkWell(
+                        //                   onTap: (){
+                        //                     pause();
+                        //                   },
+                        //                   child: CircleAvatar(
+                        //                     radius: 35,
+                        //                     backgroundColor: Colors.blue.withOpacity(0.5),
+                        //                     child: const Icon(
+                        //                         Icons.pause_outlined,
+                        //                         size: 45,
+                        //                         color: Colors.white,
+                        //                       )
+                        //                   ),
+                        //                 );
+                        //             }
+                        //           }
+                        //         ),
+                        //       ),
+                        //       IconButton(
+                        //         onPressed: () {
+                        //         },
+                        //         icon: const Icon(
+                        //           Icons.skip_next_outlined,
+                        //           color: Colors.white,
+                        //         )
+                        //       ),
+                        //       IconButton(
+                        //         onPressed: () {
+                        //         },
+                        //         icon: const Icon(
+                        //           Icons.close,
+                        //           color: Colors.white,
+                        //         )
+                        //       )
+                        //     ],
+                        //   ),
+            //             ),
+            //           ],
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // );
+          },
+        ),
     );
+
   }
 }
