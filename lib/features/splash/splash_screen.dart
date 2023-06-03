@@ -70,8 +70,7 @@ class _SplashScreenState extends State<SplashScreen> {
             }else{
               return Center(
                 child: InkWell(
-                  onTap: ()async{
-                    print("Check for Permission");
+                  onTap: () async{
                     checkForExternalPermission();
                   },
                   child: const Text("Request permission",style: TextStyle(color: Colors.white),),

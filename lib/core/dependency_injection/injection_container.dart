@@ -7,6 +7,7 @@ import 'package:music_player/features/player_details/presentation/bloc/audio_pla
 
 import '../../features/discover/data/repositories/discover_music_repository_impl.dart';
 import '../../features/player_details/data/datasource/audio_player_datasource.dart';
+import '../../features/player_details/presentation/bloc/player_state/player_state_bloc.dart';
 
 final sl = GetIt.instance;
 Future<void> init() async {
@@ -36,8 +37,12 @@ Future<void> init() async {
   sl.registerFactory<DiscoverBloc>(() => DiscoverBloc(
     discoverMusicUsecase: sl()
   ));
-   sl.registerFactory<AudioPlayerBloc>(() => AudioPlayerBloc(
+  sl.registerFactory<AudioPlayerBloc>(() => AudioPlayerBloc(
     audioPlayerUsecase: sl()
+  ));
+
+  sl.registerFactory<PlayerStateBloc>(() => PlayerStateBloc(
+    audioPlayerUseCase: sl()
   ));
 
  

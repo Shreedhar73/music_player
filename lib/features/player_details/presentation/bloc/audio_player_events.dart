@@ -20,6 +20,11 @@ class AudioPauseEvent extends AudioPlayerEvent{
   List<Object?> get props => [];
 }
 
+// class GetAudioPlayerStateEvent extends AudioPlayerEvent{
+//   @override
+//   List<Object?> get props => [];
+// }
+
 class AudioPlayerDisposeEvent extends AudioPlayerEvent{
   @override
   List<Object?> get props => [];

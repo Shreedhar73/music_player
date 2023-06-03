@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -10,6 +12,8 @@ abstract class AudioPlayerDataSource{
   Future<dynamic> play();
   Future<dynamic> pause();
   Future<dynamic> disposeAudioPlayer();
+  Future<dynamic> getPlayerState();
+  Future<dynamic> onSeek(Duration duration);
 }
 
 class AudioPlayerDataSourceImpl implements AudioPlayerDataSource{
@@ -107,5 +111,50 @@ class AudioPlayerDataSourceImpl implements AudioPlayerDataSource{
     if(audioPlayer != null){
       audioPlayer!.play();
     }
+  }
+
+  @override
+  Future onSeek(Duration duration) async{
+    audioPlayer!.seek(duration);
+    return true;
+  }
+  
+  @override
+  Future getPlayerState() async{
+    StreamController<ProgressBarState> controller = StreamController<ProgressBarState>();
+    Stream progressStream = controller.stream;
+    audioPlayer!.positionStream.listen((position) {
+      final oldState = progressBarState;
+      progressBarState = ProgressBarState(
+        current: position,
+        buffered: oldState.buffered,
+        total: oldState.total,
+      );
+      controller.add(progressBarState);
+      
+    });
+
+    audioPlayer!.bufferedPositionStream.listen((bufferedPosition) {
+      final oldState = progressBarState;
+      progressBarState = ProgressBarState(
+        current: oldState.current,
+        buffered: bufferedPosition,
+        total: oldState.total,
+      );
+      controller.add(progressBarState);
+    });
+
+    audioPlayer!.durationStream.listen((totalDuration) {
+      final oldState = progressBarState;
+      progressBarState = ProgressBarState(
+        current: oldState.current,
+        buffered: oldState.buffered,
+        total: totalDuration ?? Duration.zero,
+      );
+      controller.add(progressBarState);
+    });
+    
+    return progressStream;
+
   }
 }

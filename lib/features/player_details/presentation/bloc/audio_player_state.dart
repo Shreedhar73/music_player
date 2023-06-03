@@ -21,3 +21,16 @@ class IsPausedState extends AudioPlayerState{
   @override
   List<Object?> get props => [];
 }
+
+// class AudioProgressBarState extends AudioPlayerState{
+//   AudioProgressBarState({
+//      this.current,
+//      this.buffered,
+//      this.total,
+//   });
+//   final Duration? current;
+//   final Duration? buffered;
+//   final Duration? total;
+//   @override
+//   List<Object?> get props => [];
+// } 

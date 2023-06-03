@@ -26,9 +26,18 @@ class AppRouter extends _$AppRouter {
       path: '/bottombar',
       children: [
         AutoRoute(
-          page: DiscoverRoute.page,
-          path: 'discover',
-          maintainState: true
+          page: EmptyRouterRoute.page,
+          path: '',
+          initial: true,
+          maintainState: true,
+          children: [
+            AutoRoute(page: DiscoverRoute.page, path : 'Discover'),
+            AutoRoute(
+              page: MusicPlayerRoute.page,
+              path: '',
+              maintainState: true
+            ),
+          ]
         ),
         AutoRoute(
           page: FavoritesRoute.page,
@@ -43,10 +52,10 @@ class AppRouter extends _$AppRouter {
       ],
       maintainState: true
     ), 
-    AutoRoute(
-      page: MusicPlayerRoute.page,
-      path: '/player',
-      maintainState: true
-    ),
   ];    
  } 
+
+@RoutePage()
+class EmptyRouterPage extends AutoRouter {
+  const EmptyRouterPage({Key? key}) : super(key: key);
+}

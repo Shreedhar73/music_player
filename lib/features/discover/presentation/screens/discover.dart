@@ -20,7 +20,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Music List', style: TextStyle(color: Colors.white, fontSize: 18,fontWeight: FontWeight.bold),),
           SizedBox(
             height: MediaQuery.of(context).size.height-kBottomNavigationBarHeight - 50,
             child: BlocBuilder<DiscoverBloc,DiscoverState>(
@@ -59,7 +58,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       title: Text(songList[index]!.displayName,style: const TextStyle(color: Colors.white),),
       onTap: () {
         context.router.push(
-          MusicPlayerRoute(
+           MusicPlayerRoute(
             songList : songList,
             index: index
           ),
