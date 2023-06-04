@@ -19,7 +19,7 @@ abstract class AudioPlayerDataSource{
 class AudioPlayerDataSourceImpl implements AudioPlayerDataSource{
   AudioPlayerDataSourceImpl();
   SongModel? currentPlaying;
-  ProgressBarState progressBarState = ProgressBarState(
+  ProgressBarState progressBarState = const ProgressBarState(
     current: Duration.zero, 
     buffered: Duration.zero, 
     total: Duration.zero

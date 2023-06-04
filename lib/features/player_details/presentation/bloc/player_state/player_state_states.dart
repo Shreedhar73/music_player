@@ -7,6 +7,11 @@ class PlayerStateInitial extends PlayerStateState{
   @override
   List<Object?> get props => [];
 }
+
+class PlayerStateError extends PlayerStateState{
+  @override
+  List<Object?> get props => [];
+}
 class AudioProgressBarState extends PlayerStateState{
   AudioProgressBarState({
      this.current,
