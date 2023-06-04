@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.2 <4.0.0'
+  sdk: '>=2.19.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -46,7 +46,7 @@ dependencies:
   cached_network_image: ^3.2.3
   just_audio: ^0.9.34
   google_fonts: ^4.0.4
-  build_runner: ^2.4.4
+  build_runner: 
   # path: ^1.8.3
   on_audio_query: ^2.9.0
   permission_handler: ^10.2.0
