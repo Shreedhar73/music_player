@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
 import 'package:music_player/features/splash/presentation/screens/splash_screen.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 import '../../features/bottom_nav/presentation/screens/bottom_bar.dart';
 import '../../features/discover/presentation/screens/discover.dart';
 import '../../features/favorites/presentation/screens/favorites.dart';
@@ -24,9 +26,18 @@ class AppRouter extends _$AppRouter {
       path: '/bottombar',
       children: [
         AutoRoute(
-          page: DiscoverRoute.page,
-          path: 'discover',
-          maintainState: true
+          page: EmptyRouterRoute.page,
+          path: '',
+          initial: true,
+          maintainState: true,
+          children: [
+            AutoRoute(page: DiscoverRoute.page, path : 'Discover'),
+            AutoRoute(
+              page: MusicPlayerRoute.page,
+              path: '',
+              maintainState: true
+            ),
+          ]
         ),
         AutoRoute(
           page: FavoritesRoute.page,
@@ -41,10 +52,10 @@ class AppRouter extends _$AppRouter {
       ],
       maintainState: true
     ), 
-    AutoRoute(
-      page: MusicPlayerRoute.page,
-      path: '/player',
-      maintainState: true
-    ),
   ];    
  } 
+
+@RoutePage()
+class EmptyRouterPage extends AutoRouter {
+  const EmptyRouterPage({Key? key}) : super(key: key);
+}

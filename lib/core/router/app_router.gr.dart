@@ -15,6 +15,12 @@ abstract class _$AppRouter extends RootStackRouter {
 
   @override
   final Map<String, PageFactory> pagesMap = {
+    EmptyRouterRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const EmptyRouterPage(),
+      );
+    },
     BottombarRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -34,9 +40,15 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     MusicPlayerRoute.name: (routeData) {
+      final args = routeData.argsAs<MusicPlayerRouteArgs>(
+          orElse: () => const MusicPlayerRouteArgs());
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const MusicPlayerScreen(),
+        child: MusicPlayerScreen(
+          key: args.key,
+          songList: args.songList,
+          index: args.index,
+        ),
       );
     },
     PlaylistsRoute.name: (routeData) {
@@ -52,6 +64,20 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
   };
+}
+
+/// generated route for
+/// [EmptyRouterPage]
+class EmptyRouterRoute extends PageRouteInfo<void> {
+  const EmptyRouterRoute({List<PageRouteInfo>? children})
+      : super(
+          EmptyRouterRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'EmptyRouterRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -98,16 +124,45 @@ class FavoritesRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [MusicPlayerScreen]
-class MusicPlayerRoute extends PageRouteInfo<void> {
-  const MusicPlayerRoute({List<PageRouteInfo>? children})
-      : super(
+class MusicPlayerRoute extends PageRouteInfo<MusicPlayerRouteArgs> {
+  MusicPlayerRoute({
+    Key? key,
+    List<SongModel?>? songList,
+    int index = 0,
+    List<PageRouteInfo>? children,
+  }) : super(
           MusicPlayerRoute.name,
+          args: MusicPlayerRouteArgs(
+            key: key,
+            songList: songList,
+            index: index,
+          ),
           initialChildren: children,
         );
 
   static const String name = 'MusicPlayerRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<MusicPlayerRouteArgs> page =
+      PageInfo<MusicPlayerRouteArgs>(name);
+}
+
+class MusicPlayerRouteArgs {
+  const MusicPlayerRouteArgs({
+    this.key,
+    this.songList,
+    this.index = 0,
+  });
+
+  final Key? key;
+
+  final List<SongModel?>? songList;
+
+  final int index;
+
+  @override
+  String toString() {
+    return 'MusicPlayerRouteArgs{key: $key, songList: $songList, index: $index}';
+  }
 }
 
 /// generated route for

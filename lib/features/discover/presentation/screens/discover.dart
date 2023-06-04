@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:music_player/core/router/app_router.dart';
 import 'package:music_player/features/discover/presentation/bloc/discover_bloc.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 @RoutePage()  
@@ -19,7 +20,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Music List', style: TextStyle(color: Colors.white, fontSize: 18,fontWeight: FontWeight.bold),),
           SizedBox(
             height: MediaQuery.of(context).size.height-kBottomNavigationBarHeight - 50,
             child: BlocBuilder<DiscoverBloc,DiscoverState>(
@@ -32,8 +32,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (BuildContext context ,index){
-                            SongModel? song = state.songsList[index];
-                            return songTile(song!);
+                            return songTile(state.songsList,index);
                           },
                           childCount: state.songsList.length
                         ),
@@ -52,13 +51,21 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
-  songTile(SongModel song){
+  songTile(List<SongModel?> songList,int index){
     return ListTile(
       minVerticalPadding: 0,
       contentPadding: EdgeInsets.zero,
-      title: Text(song.displayName,style: const TextStyle(color: Colors.white),),
+      title: Text(songList[index]!.displayName,style: const TextStyle(color: Colors.white),),
+      onTap: () {
+        context.router.push(
+           MusicPlayerRoute(
+            songList : songList,
+            index: index
+          ),
+        );
+      },
       leading: QueryArtworkWidget(
-        id: song.id,
+        id: songList[index]!.id,
         type: ArtworkType.AUDIO,
       )
     );
