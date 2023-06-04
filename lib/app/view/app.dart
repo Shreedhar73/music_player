@@ -18,6 +18,8 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context)=> sl<DiscoverBloc>()),
         BlocProvider(create: (context)=> sl<PermissionBloc>()),
+        BlocProvider(create: (context)=> sl<AudioPlayerBloc>()),
+        BlocProvider(create: (context)=> sl<PlayerStateBloc>()),
       ],
       child: MaterialApp.router(
         title: 'Flutter Demo',

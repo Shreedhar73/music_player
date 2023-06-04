@@ -68,10 +68,6 @@ Future<void> init() async {
     permissionUseCase: sl()
   ));
 
-  sl.registerFactory<PermissionBloc>(() => PermissionBloc(
-    permissionUseCase: sl()
-  ));
-
  
   
   
